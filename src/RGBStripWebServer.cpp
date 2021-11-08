@@ -30,15 +30,6 @@ private:
 
     inline void setupRoutes() {
 
-        server->on("/posttest", HTTP_POST, [] (AsyncWebServerRequest *request) {
-            Serial.print("Param count: ");
-            Serial.println(request->params());
-
-            Serial.println(request->getParam("ThatKey")->value());
-
-            request->send(200, "text/plain", "OK");
-        });
-
         server->on("/setRGB", HTTP_ANY, [&](AsyncWebServerRequest *request) {
             int r = request->getParam("r")->value().toInt();
             int g = request->getParam("g")->value().toInt();
@@ -65,10 +56,10 @@ private:
             if (request->hasParam("brightness")) {
                 int brightness = request->getParam("brightness")->value().toInt();
                 strip->setBrightness(brightness);
-                Serial.printf("Set brightness to %d\n", brightness);
+                Serial.printf("DEBUG: Setting brightness to %d\n", brightness);
                 request->send(200, "text/plain", "OK");
             } else {
-                Serial.println("Bad call to /setBrightness");
+                Serial.print("Missing brightness parameter");
                 request->send(400, "text/plain", "Bad Request");
             }
         });

@@ -8,13 +8,14 @@
 // ---- Parameters ----
 #define DATA_PIN    2
 #define NUM_LEDS    50
-#define BRIGHTNESS  50
+#define BRIGHTNESS  255
 #define FPS         60
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
 
 class RGBStrip {
+    
 private:
   CRGB* leds = new CRGB[NUM_LEDS];
   CRGB* leds_bkp = new CRGB[NUM_LEDS];
@@ -24,7 +25,6 @@ private:
 
   unsigned long thisTime;
   unsigned long lastTime = 0;
-
 
 
 public:
@@ -83,3 +83,18 @@ public:
         }
     }
 };
+
+    // // Function Pointer Array Demo
+    // typedef void (*farray)();
+    // farray modes[5] = {NULL};
+
+    // // modes[0] = &test;
+    // modes[0] = []() {
+    //     cout << "Test anon" << endl;
+    // };
+
+    // modes[1] = []() {
+    //     cout << "Anon #2" << endl;
+    // };
+
+    // modes[1]();

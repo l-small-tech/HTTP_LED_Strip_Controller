@@ -12,7 +12,7 @@ RGBStripWebServer* ws;
 void setup() {
 
   // Safety Delay
-  delay(1000);
+  delay(750);
 
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -23,20 +23,11 @@ void setup() {
 
   Serial.println("Ready to roll!");
 
-    // // Function Pointer Array Demo
-    // typedef void (*farray)();
-    // farray modes[5] = {NULL};
+  // Turn the annoying blue Light off
+  pinMode(D4, OUTPUT);
+  digitalWrite(D4, HIGH);
 
-    // // modes[0] = &test;
-    // modes[0] = []() {
-    //     cout << "Test anon" << endl;
-    // };
 
-    // modes[1] = []() {
-    //     cout << "Anon #2" << endl;
-    // };
-
-    // modes[1]();
 }
 
 void loop() {
