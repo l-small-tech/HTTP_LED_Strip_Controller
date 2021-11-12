@@ -2,6 +2,14 @@
 #define RGBSTRIP
 #endif
 
+/*
+    White High density Strip: BTF-LIGHTING RGBW RGBNW Natural White SK6812 (Similar WS2812B)
+    Black Lower Density Strip: SK6812 RGBW RGB Warm RGBNW Led Strip
+
+    On the Wemos D1 Mini, Use D7 as the Data Pin. D7 == GPIO 13 == MOSI
+    Use 430-470 Ohm with the data pin
+*/
+
 #include <FastLED.h>
 #include <Arduino.h>
 
@@ -9,7 +17,7 @@
 #define DATA_PIN    2
 #define NUM_LEDS    50
 #define BRIGHTNESS  255
-#define FPS         60
+#define FPS         48
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
@@ -33,11 +41,30 @@ public:
         FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
         FastLED.setBrightness(brightness);
     }
+
+    void push(int r, int g, int b) {
+        // Set first led to color
+        leds_bkp[0] = CRGB(r, g, b);
+
+        // Shift all the leds one place down the strip
+        for (int i = 0; i < NUM_LEDS - 1; i++) {
+            leds_bkp[i + 1] = leds[i];
+        }
+
+        // Copy the new shifted data to the strip
+        for (int i = 0; i < NUM_LEDS; i++) {
+            leds[i] = leds_bkp[i];
+        }
+
+        showSync();
+    }
     
     void setBrightness(int b) {
+
         this->brightness = b;
         FastLED.setBrightness(b);
-        FastLED.show();
+
+        showSync();
     }
 
     void setStripColor(int r, int g, int b) {
@@ -45,7 +72,9 @@ public:
         for (int i = 0; i < NUM_LEDS; i++) {
             leds[i] = CRGB(r, g, b);
         }
-        FastLED.show();
+
+        showSync();
+        Serial.printf("DEBUG:\tSet strip color to R: %d, G: %d, B: %d\n", r, g, b);
     }
 
     void on() {
@@ -54,7 +83,7 @@ public:
             leds[i] = leds_bkp[i];
         }
 
-        FastLED.show();
+        showSync();
     }
 
     void off() {
@@ -68,10 +97,11 @@ public:
             leds[i] = CRGB::Black;
         }
 
-        FastLED.show();
+        showSync();
     }
 
     void showSync() {
+
         while (true) {
             thisTime = millis();
             if (thisTime - lastTime > 1000 / FPS) { 
@@ -81,6 +111,9 @@ public:
             }
             delay(1);
         }
+    }
+
+    void loopHook() {
     }
 };
 

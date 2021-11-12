@@ -30,23 +30,29 @@ private:
 
     inline void setupRoutes() {
 
-        server->on("/setRGB", HTTP_ANY, [&](AsyncWebServerRequest *request) {
-            int r = request->getParam("r")->value().toInt();
-            int g = request->getParam("g")->value().toInt();
-            int b = request->getParam("b")->value().toInt();
-            strip->setStripColor(r, g, b);
-            request->send(200, "text/plain", "OK");
-        });
-
-        // Turn off Route
         server->on("/off", HTTP_ANY, [&](AsyncWebServerRequest *request) {
+
             strip->off();
             request->send(200, "text/plain", "OK");
         });
 
-        // Turn on Route
         server->on("/on", HTTP_ANY, [&](AsyncWebServerRequest *request) {
+
             strip->on();
+            request->send(200, "text/plain", "OK");
+        });
+
+        // Push a color to the strip
+        server->on("/push", HTTP_ANY, [&](AsyncWebServerRequest *request) {
+
+            Serial.println("/push called.");
+
+            int r = request->getParam("r")->value().toInt();
+            int g = request->getParam("g")->value().toInt();
+            int b = request->getParam("b")->value().toInt();
+
+            strip->push(r, g, b);
+            Serial.printf("Pushed color: %d, %d, %d\n\n", r, g, b);
             request->send(200, "text/plain", "OK");
         });
 
@@ -62,6 +68,20 @@ private:
                 Serial.print("Missing brightness parameter");
                 request->send(400, "text/plain", "Bad Request");
             }
+        });
+
+        server->on("/setRGB", HTTP_ANY, [&](AsyncWebServerRequest *request) {
+
+            Serial.println("DEBUG:\t/setRGB Called");
+
+            int r = request->getParam("r")->value().toInt();
+            int g = request->getParam("g")->value().toInt();
+            int b = request->getParam("b")->value().toInt();
+
+            Serial.printf("DEBUG:\tSetting RGB to R: %d, G: %d, B: %d\n", r, g, b);
+
+            strip->setStripColor(r, g, b);
+            request->send(200, "text/plain", "OK");
         });
     }
 
@@ -79,5 +99,9 @@ public:
 
         // Start server
         server->begin();
+    }
+
+    void loopHook() {
+        strip->loopHook();
     }
 };
